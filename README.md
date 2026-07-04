@@ -302,9 +302,31 @@ npm run test:coverage
 
 ```
 tests/
-├── setup.ts          # Configuración global de Jest
-└── health.test.ts    # Pruebas del endpoint /health
+├── setup.ts                              # Configuración global de Jest
+├── health.test.ts                        # Tests de /health
+├── integration/
+│   ├── products/
+│   │   └── products.routes.test.ts      # Tests de endpoints de productos
+│   ├── inventory/
+│   │   └── inventory.routes.test.ts     # Tests de endpoints de inventario
+│   ├── alerts/
+│   │   └── alerts.routes.test.ts        # Tests de endpoints de alertas
+│   └── purchase-orders/
+│       └── purchase-orders.routes.test.ts # Tests de endpoints de órdenes
+└── unit/
+    └── services/
+        ├── products.service.test.ts      # Tests unitarios de ProductsService
+        ├── inventory.service.test.ts    # Tests unitarios de InventoryService
+        └── purchase-orders.service.test.ts # Tests unitarios de PurchaseOrdersService
 ```
+
+### Cobertura de tests
+
+| Tipo | Cantidad | Descripción |
+|------|----------|-------------|
+| **Unitarios** | 27 | Tests de lógica de negocio (services) |
+| **Integración** | 29 | Tests de endpoints HTTP |
+| **Total** | **56** | Todos pasando ✅ |
 
 ## Convenciones
 
@@ -366,13 +388,56 @@ Todos los mensajes de la API están en **español**.
 
 ## Próximos Pasos
 
-- [ ] Implementar módulo de productos
-- [ ] Implementar gestión de inventario (entradas/salidas)
-- [ ] Implementar sistema de alertas de stock bajo
-- [ ] Implementar órdenes de compra
-- [ ] Agregar más pruebas unitarias e integración
+- [x] ~~Implementar módulo de productos~~
+- [x] ~~Implementar gestión de inventario (entradas/salidas)~~
+- [x] ~~Implementar sistema de alertas de stock bajo~~
+- [x] ~~Implementar órdenes de compra~~
+- [x] ~~Agregar más pruebas unitarias e integración~~
 - [ ] Configurar CI/CD
 - [ ] Desplegar en nube
+
+## Endpoints Implementados
+
+### Health
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/health` | Verificar estado del servidor |
+
+### Products (RF-01)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/products` | Crear un nuevo producto |
+| GET | `/products` | Listar productos (con filtros) |
+| GET | `/products/:id` | Obtener producto por ID |
+
+### Inventory (RF-02, RF-03, RF-06)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/inventory/adjust` | Ajustar stock (ENTRY/EXIT) |
+| GET | `/inventory` | Consultar inventario (con filtros) |
+| GET | `/inventory/movements/:productId` | Ver historial de movimientos |
+
+### Alerts (RF-03)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/alerts` | Listar alertas (con filtro por status) |
+| GET | `/alerts/:id` | Obtener alerta por ID |
+| POST | `/alerts/:id/resolve` | Resolver una alerta |
+
+### Purchase Orders (RF-04, RF-05)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/purchase-orders` | Crear orden de compra |
+| GET | `/purchase-orders` | Listar órdenes (con filtros) |
+| GET | `/purchase-orders/:id` | Obtener orden por ID |
+| PATCH | `/purchase-orders/:id/approve` | Aprobar orden (PENDING → APPROVED) |
+| PATCH | `/purchase-orders/:id/reject` | Rechazar orden (PENDING → REJECTED) |
+| PATCH | `/purchase-orders/:id/receive` | Recibir orden (APPROVED → RECEIVED) |
 
 ## Licencia
 

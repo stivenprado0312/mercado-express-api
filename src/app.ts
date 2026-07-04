@@ -11,6 +11,7 @@ import { successResponse } from './shared/responses/index';
 import productsRoutes from './modules/products/products.routes';
 import inventoryRoutes from './modules/inventory/inventory.routes';
 import purchaseOrdersRoutes from './modules/purchase-orders/purchase-orders.routes';
+import alertsRoutes from './modules/alerts/alerts.routes';
 
 export function createApp(): Application {
   const app = express();
@@ -38,6 +39,7 @@ export function createApp(): Application {
   app.use('/products', productsRoutes);
   app.use('/inventory', inventoryRoutes);
   app.use('/purchase-orders', purchaseOrdersRoutes);
+  app.use('/alerts', alertsRoutes);
 
   app.use(notFoundMiddleware);
   app.use(errorHandler);

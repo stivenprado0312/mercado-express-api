@@ -33,6 +33,10 @@ const options = {
       {
         name: 'Purchase Orders',
         description: 'Gestión de órdenes de compra a proveedores'
+      },
+      {
+        name: 'Alerts',
+        description: 'Gestión de alertas de stock bajo'
       }
     ],
     components: {
