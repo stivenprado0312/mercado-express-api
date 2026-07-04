@@ -20,11 +20,15 @@ const options = {
     tags: [
       {
         name: 'Health',
-        description: 'Endpoints de salud de la API'
+        description: 'Endpoint inicial'
       },
       {
         name: 'Products',
         description: 'Gestión de productos del inventario'
+      },
+      {
+        name: 'Inventory',
+        description: 'Gestión de movimientos y ajustes de inventario'
       }
     ],
     components: {

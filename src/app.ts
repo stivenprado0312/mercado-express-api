@@ -9,6 +9,7 @@ import { notFoundMiddleware, errorHandler } from './middlewares/index';
 import { swaggerSpec } from './shared/swagger/index';
 import { successResponse } from './shared/responses/index';
 import productsRoutes from './modules/products/products.routes';
+import inventoryRoutes from './modules/inventory/inventory.routes';
 
 export function createApp(): Application {
   const app = express();
@@ -34,6 +35,7 @@ export function createApp(): Application {
   });
 
   app.use('/products', productsRoutes);
+  app.use('/inventory', inventoryRoutes);
 
   app.use(notFoundMiddleware);
   app.use(errorHandler);
