@@ -8,6 +8,7 @@ import { logger } from './shared/logger/index';
 import { notFoundMiddleware, errorHandler } from './middlewares/index';
 import { swaggerSpec } from './shared/swagger/index';
 import { successResponse } from './shared/responses/index';
+import productsRoutes from './modules/products/products.routes';
 
 export function createApp(): Application {
   const app = express();
@@ -29,8 +30,10 @@ export function createApp(): Application {
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
   app.get('/health', (_req: Request, res: Response) => {
-    successResponse(res, 'API is running');
+    successResponse(res, 'Mercado Express is running');
   });
+
+  app.use('/products', productsRoutes);
 
   app.use(notFoundMiddleware);
   app.use(errorHandler);

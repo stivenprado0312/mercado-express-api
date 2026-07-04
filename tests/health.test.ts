@@ -4,13 +4,13 @@ import { createApp } from '../src/app';
 describe('GET /health', () => {
   const app = createApp();
 
-  it('debe retornar 200 con success true y message "API is running"', async () => {
+  it('debe retornar 200 con success true y message "Mercado Express is running"', async () => {
     const response = await request(app).get('/health');
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       success: true,
-      message: 'API is running'
+      message: 'Mercado Express is running'
     });
   });
 
