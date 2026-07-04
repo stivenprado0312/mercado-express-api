@@ -29,6 +29,10 @@ const options = {
       {
         name: 'Inventory',
         description: 'Gestión de movimientos y ajustes de inventario'
+      },
+      {
+        name: 'Purchase Orders',
+        description: 'Gestión de órdenes de compra a proveedores'
       }
     ],
     components: {
