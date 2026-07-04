@@ -4,441 +4,175 @@ API REST para gestión de inventario de MercadoExpress.
 
 ## Descripción
 
-Sistema de gestión de inventario para la cadena de tiendas minoristas MercadoExpress. Permite controlar el stock de productos, generar alertas automáticas cuando el stock baja de un umbral mínimo, y gestionar órdenes de compra a proveedores.
-
-## Objetivo
-
-Este proyecto forma parte de una prueba técnica para evaluar habilidades en diseño arquitectónico, implementación de APIs REST con Node.js, TypeScript y PostgreSQL.
+Sistema de gestión de inventario para cadena de tiendas minoristas. Controla stock de productos, genera alertas automáticas cuando el stock baja del umbral mínimo, y gestiona órdenes de compra a proveedores.
 
 ## Arquitectura
 
-Se utiliza una **Arquitectura Basada en Features** (Feature-Based Architecture) que separa el código por funcionalidad del dominio, facilitando:
-
-- Escalabilidad modular
-- Separation of Concerns
-- Mantenibilidad
-- Testing
+**Feature-Based Architecture** - Código organizado por dominio de negocio:
 
 ```
 src/
-├── config/           # Configuración de variables de entorno
+├── config/           # Variables de entorno
 ├── database/         # Cliente Prisma
-├── middlewares/      # Middlewares Express (404, error handler)
-├── modules/          # Módulos de dominio (vacío en base inicial)
-├── shared/           # Código compartido
-│   ├── constants/    # Constantes de la aplicación
-│   ├── errors/       # Clases de errores personalizados
-│   ├── logger/       # Configuración de Pino
-│   ├── responses/    # Helpers de respuesta HTTP
-│   ├── swagger/       # Configuración de Swagger
-│   ├── utils/        # Utilidades comunes
-│   └── validators/  # Validadores Zod
-├── app.ts            # Configuración de Express
-└── server.ts         # Punto de entrada
+├── middlewares/      # Middlewares Express
+├── modules/          # Módulos de dominio
+│   ├── products/
+│   ├── inventory/
+│   ├── alerts/
+│   └── purchase-orders/
+├── shared/
+│   ├── constants/    # Constantes compartidas
+│   ├── errors/       # Errores personalizados
+│   ├── utils/        # Utilidades
+│   └── middlewares/  # Middlewares compartidos
+├── app.ts
+└── server.ts
 ```
 
-## Justificación Técnica
+### Justificación Técnica
 
-### Feature-Based Architecture
+| Decisión | Razón |
+|----------|-------|
+| Feature-based | Código cohesionado por dominio, fácil de escalar |
+| TypeScript | Tipado estático = mayor seguridad |
+| Prisma ORM | Type-safe, migrations automáticas |
+| Zod | Validación con inferencia de tipos |
+| State Machine | Patrón para transiciones de órdenes (OCP compliant) |
 
-Esta arquitectura organiza el código por dominio de negocio (features), no por tipo técnico. Cada feature contiene:
+## Stack Tecnológico
 
-- Controladores
-- Servicios
-- Repositorios
-- Rutas
-- Modelos de datos
-
-**Ventajas:**
-- Código relacionado está cohesionado
-- Facilita agregar nuevos features sin modificar código existente
-- Mejor organización para equipos grandes
-- Escalabilidad horizontal del código
-
-### Stack Tecnológico
-
-| Tecnología | Justificación |
-|------------|---------------|
-| **Node.js LTS** | Runtime estable con soporte a largo plazo |
-| **Express** | Framework minimalista y flexible para APIs REST |
-| **TypeScript** | Tipado estático para mayor seguridad y mantenibilidad |
-| **Prisma ORM** | ORM type-safe con migrations automáticas |
-| **PostgreSQL** | Base de datos relacional robusta y escalable |
-| **Zod** | Validación de esquemas con inferencia de tipos |
-| **Pino** | Logging performante con estructura JSON |
-| **Swagger** | Documentación interactiva de APIs |
-| **Jest + Supertest** | Testing unitario e integración |
-| **ESLint + Prettier** | Calidad y consistencia de código |
-| **Husky** | Git hooks para calidad pre-commit |
-
-## Tecnologías
-
-- **Runtime:** Node.js LTS (22.x)
-- **Framework:** Express 4.x
-- **Lenguaje:** TypeScript 5.x
-- **ORM:** Prisma 5.x
-- **Base de datos:** PostgreSQL 16
-- **Validación:** Zod 3.x
-- **Logging:** Pino 9.x
-- **Documentación:** Swagger (OpenAPI 3.0)
-- **Testing:** Jest 29.x + Supertest 7.x
-- **Linting:** ESLint 9.x + Prettier 3.x
-- **Git Hooks:** Husky 9.x + lint-staged 15.x
-- **Contenedores:** Docker + Docker Compose
+| Tecnología | Propósito |
+|------------|-----------|
+| Node.js LTS | Runtime |
+| Express 4.x | Framework API REST |
+| TypeScript 5.x | Lenguaje tipado |
+| Prisma 5.x | ORM |
+| PostgreSQL 16 | Base de datos relacional |
+| Zod 3.x | Validación de schemas |
+| Pino 9.x | Logging |
+| Swagger | Documentación interactiva |
+| Jest + Supertest | Testing |
+| ESLint + Prettier | Linting y formateo |
 
 ## Instalación
 
-### Requisitos Previos
-
-- Node.js LTS (v22.x o superior)
-- npm o yarn
-- PostgreSQL 16 (local o Docker)
-- Docker y Docker Compose (opcional)
+### Requisitos
+- Node.js LTS (v22.x)
+- PostgreSQL 16
+- Docker (opcional)
 
 ### Pasos
 
-1. **Clonar el repositorio**
-
 ```bash
-git clone <url-del-repositorio>
+# 1. Clonar e instalar
+git clone <url>
 cd mercado-express-api
-```
-
-2. **Instalar dependencias**
-
-```bash
 npm install
-```
 
-3. **Configurar variables de entorno**
-
-```bash
+# 2. Configurar entorno
 cp .env.example .env
-```
+# Editar .env con DATABASE_URL
 
-Editar `.env` con las credenciales de la base de datos:
-
-```env
-NODE_ENV=development
-PORT=3000
-DATABASE_URL=postgresql://postgres:admin@localhost:5432/mercado_express?schema=public
-LOG_LEVEL=info
-```
-
-4. **Generar cliente Prisma**
-
-```bash
+# 3. Generar cliente Prisma y migrar
 npm run prisma:generate
-```
-
-5. **Ejecutar migraciones**
-
-```bash
 npm run prisma:migrate
-```
 
-6. **Iniciar el servidor**
-
-```bash
+# 4. Iniciar
 npm run dev
 ```
 
-El servidor estará disponible en `http://localhost:3000`
-
-## Variables de Entorno
-
-| Variable | Descripción | Default |
-|----------|-------------|---------|
-| `NODE_ENV` | Entorno de ejecución (development, production, test) | `development` |
-| `PORT` | Puerto del servidor | `3000` |
-| `DATABASE_URL` | URL de conexión a PostgreSQL | - |
-| `LOG_LEVEL` | Nivel de logging (trace, debug, info, warn, error, fatal) | `info` |
-
-## Docker
-
-### Usando Docker Compose
-
-Para levantar PostgreSQL y pgAdmin:
+### Docker (PostgreSQL)
 
 ```bash
 docker compose up -d
 ```
 
-Esto iniciara:
+Variables de entorno necesarias:
+```env
+NODE_ENV=development
+PORT=3000
+DATABASE_URL=postgresql://postgres:admin@localhost:5432/mercado_express
+LOG_LEVEL=info
+```
 
-- **PostgreSQL** en puerto 5432
-- **pgAdmin** en puerto 5050 (http://localhost:5050)
+## Scripts
 
-### Credenciales
+| Comando | Descripción |
+|---------|-------------|
+| `npm run dev` | Servidor desarrollo (hot-reload) |
+| `npm run build` | Compilar TypeScript |
+| `npm run start` | Servidor producción |
+| `npm run lint` | Verificar código |
+| `npm run test` | Ejecutar pruebas |
+| `npm run test:coverage` | Reporte de cobertura |
+| `npm run prisma:studio` | GUI de Prisma |
 
-**PostgreSQL:**
-- Host: localhost
-- Puerto: 5432
-- Usuario: postgres
-- Contraseña: admin
-- Base de datos: mercado_express
+## Endpoints
 
-**pgAdmin:**
-- Email: admin@admin.com
-- Contraseña: admin
+### Health
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/health` | Estado del servidor |
 
-## Prisma
+### Products (RF-01)
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/products` | Crear producto |
+| GET | `/products` | Listar productos |
+| GET | `/products/:id` | Obtener por ID |
 
-### Comandos comunes
+### Inventory (RF-02, RF-03)
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/inventory/adjust` | Ajustar stock |
+| GET | `/inventory` | Consultar inventario |
+| GET | `/inventory/movements/:productId` | Historial movimientos |
+
+### Alerts (RF-03)
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/alerts` | Listar alertas |
+| GET | `/alerts/:id` | Obtener alerta |
+| POST | `/alerts/:id/resolve` | Resolver alerta |
+
+### Purchase Orders (RF-04, RF-05)
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/purchase-orders` | Crear orden |
+| GET | `/purchase-orders` | Listar órdenes |
+| GET | `/purchase-orders/:id` | Obtener orden |
+| PATCH | `/purchase-orders/:id/approve` | Aprobar (PENDING→APPROVED) |
+| PATCH | `/purchase-orders/:id/reject` | Rechazar (PENDING→REJECTED) |
+| PATCH | `/purchase-orders/:id/receive` | Recibir (APPROVED→RECEIVED) |
+
+## Testing
 
 ```bash
-# Generar cliente Prisma
-npm run prisma:generate
+npm test                    # Todas las pruebas
+npm run test:coverage       # Con cobertura
+```
 
-# Crear migración
-npm run prisma:migrate
+| Tipo | Cantidad |
+|------|----------|
+| Unitarios | 27 |
+| Integración | 29 |
+| **Total** | **56** |
 
-# Poblar base de datos con seed
-npm run seed
+Documentación API interactiva: `http://localhost:3000/docs`
 
-# Abrir Prisma Studio
-npm run prisma:studio
+## Commits
 
-# Resetear base de datos
-npx prisma migrate reset
+Conventional Commits:
+```
+feat: nueva funcionalidad
+fix: corrección de bug
+docs: documentación
+refactor: refactorización
+test: pruebas
 ```
 
 ## Modelo de Datos
 
-El dominio de inventario está modelado con 4 entidades principales:
+Entidades: **Product**, **InventoryMovement**, **Alert**, **PurchaseOrder**
 
-### Product
-Producto del inventario con stock controlable.
-
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `id` | UUID | Identificador único |
-| `name` | String | Nombre del producto |
-| `sku` | String | Código único (alfanumérico 6-20 chars) |
-| `category` | String | Categoría (Bebidas, Lácteos, Snacks, Limpieza, etc.) |
-| `price` | Decimal | Precio unitario |
-| `currentStock` | Int | Stock actual (inicia en 0) |
-| `minimumStock` | Int | Umbral mínimo para alertas |
-| `supplier` | String | Nombre del proveedor |
-
-### InventoryMovement
-Historial de movimientos de inventario (inmutable).
-
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `id` | UUID | Identificador único |
-| `productId` | UUID | Producto relacionado |
-| `type` | Enum | ENTRY (entrada) o EXIT (salida) |
-| `quantity` | Int | Cantidad movimentada |
-| `reason` | String | Motivo del movimiento |
-
-### Alert
-Alerta de stock bajo generada automáticamente.
-
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `id` | UUID | Identificador único |
-| `productId` | UUID | Producto relacionado |
-| `type` | Enum | LOW_STOCK |
-| `status` | Enum | ACTIVE o RESOLVED |
-| `resolvedAt` | DateTime | Fecha de resolución (nullable) |
-
-### PurchaseOrder
-Orden de compra a proveedor con snapshot del proveedor.
-
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `id` | UUID | Identificador único |
-| `productId` | UUID | Producto relacionado |
-| `supplier` | String | Snapshot del proveedor al momento de crear |
-| `quantity` | Int | Cantidad ordenada |
-| `status` | Enum | PENDING, APPROVED, REJECTED, RECEIVED |
-| `rejectionReason` | String | Motivo de rechazo (nullable) |
-| `approvedAt` | DateTime | Fecha de aprobación (nullable) |
-| `receivedAt` | DateTime | Fecha de recepción (nullable) |
-
-## Scripts
-
-| Script | Descripción |
-|--------|-------------|
-| `npm run dev` | Iniciar servidor en modo desarrollo con hot-reload |
-| `npm run build` | Compilar TypeScript a JavaScript |
-| `npm run start` | Iniciar servidor con código compilado |
-| `npm run lint` | Verificar código con ESLint |
-| `npm run lint:fix` | Corregir errores de lint automáticamente |
-| `npm run test` | Ejecutar pruebas |
-| `npm run test:watch` | Ejecutar pruebas en modo watch |
-| `npm run test:coverage` | Generar reporte de cobertura |
-| `npm run prisma:generate` | Generar cliente Prisma |
-| `npm run prisma:migrate` | Crear/aplicar migraciones |
-| `npm run prisma:seed` | Poblar base de datos con seed |
-| `npm run seed` | Ejecutar seed con tsx |
-| `npm run prisma:studio` | Abrir GUI de Prisma |
-
-## Swagger
-
-Documentación interactiva disponible en:
-
-```
-http://localhost:3000/docs
-```
-
-## Testing
-
-### Ejecutar pruebas
-
-```bash
-# Todas las pruebas
-npm test
-
-# Modo watch
-npm run test:watch
-
-# Con cobertura
-npm run test:coverage
-```
-
-### Estructura de pruebas
-
-```
-tests/
-├── setup.ts                              # Configuración global de Jest
-├── health.test.ts                        # Tests de /health
-├── integration/
-│   ├── products/
-│   │   └── products.routes.test.ts      # Tests de endpoints de productos
-│   ├── inventory/
-│   │   └── inventory.routes.test.ts     # Tests de endpoints de inventario
-│   ├── alerts/
-│   │   └── alerts.routes.test.ts        # Tests de endpoints de alertas
-│   └── purchase-orders/
-│       └── purchase-orders.routes.test.ts # Tests de endpoints de órdenes
-└── unit/
-    └── services/
-        ├── products.service.test.ts      # Tests unitarios de ProductsService
-        ├── inventory.service.test.ts    # Tests unitarios de InventoryService
-        └── purchase-orders.service.test.ts # Tests unitarios de PurchaseOrdersService
-```
-
-### Cobertura de tests
-
-| Tipo | Cantidad | Descripción |
-|------|----------|-------------|
-| **Unitarios** | 27 | Tests de lógica de negocio (services) |
-| **Integración** | 29 | Tests de endpoints HTTP |
-| **Total** | **56** | Todos pasando ✅ |
-
-## Convenciones
-
-### Código
-
-- **Archivos y carpetas:** kebab-case (ej: `user-service.ts`, `order-items/`)
-- **TypeScript:** camelCase para variables, funciones y métodos
-- **PostgreSQL:** snake_case para tablas y columnas
-- **Prisma:** camelCase en modelos con `@map` y `@@map` para PostgreSQL
-- **Constantes:** UPPER_SNAKE_CASE
-- **Clases:** PascalCase
-- **Interfaces:** PascalCase con prefijo `I` (opcional)
-
-### Modelo de Datos
-
-- **Modelos en singular:** `User`, `Product`, `Order`
-- **Tablas en plural:** `users`, `products`, `orders`
-
-### Commits
-
-Seguimos **Conventional Commits**:
-
-```
-feat: nueva funcionalidad
-fix: corrección de bug
-docs: cambios en documentación
-style: formateo, comas faltantes, etc.
-refactor: refactorización de código
-test: agregado de pruebas
-chore: mantenimiento, dependencias, etc.
-```
-
-### Mensajes de API
-
-Todos los mensajes de la API están en **español**.
-
-## Flujo de Trabajo
-
-1. Crear una nueva rama desde `main`:
-   ```bash
-   git checkout -b feature/nombre-del-feature
-   ```
-
-2. Implementar los cambios siguiendo las convenciones.
-
-3. Ejecutar linter y pruebas:
-   ```bash
-   npm run lint
-   npm test
-   ```
-
-4. Realizar commit con mensaje descriptivo:
-   ```bash
-   git add .
-   git commit -m "feat: agregar módulo de productos"
-   ```
-
-5. Push y crear Pull Request.
-
-## Próximos Pasos
-
-- [x] ~~Implementar módulo de productos~~
-- [x] ~~Implementar gestión de inventario (entradas/salidas)~~
-- [x] ~~Implementar sistema de alertas de stock bajo~~
-- [x] ~~Implementar órdenes de compra~~
-- [x] ~~Agregar más pruebas unitarias e integración~~
-- [ ] Configurar CI/CD
-- [ ] Desplegar en nube
-
-## Endpoints Implementados
-
-### Health
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/health` | Verificar estado del servidor |
-
-### Products (RF-01)
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/products` | Crear un nuevo producto |
-| GET | `/products` | Listar productos (con filtros) |
-| GET | `/products/:id` | Obtener producto por ID |
-
-### Inventory (RF-02, RF-03, RF-06)
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/inventory/adjust` | Ajustar stock (ENTRY/EXIT) |
-| GET | `/inventory` | Consultar inventario (con filtros) |
-| GET | `/inventory/movements/:productId` | Ver historial de movimientos |
-
-### Alerts (RF-03)
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/alerts` | Listar alertas (con filtro por status) |
-| GET | `/alerts/:id` | Obtener alerta por ID |
-| POST | `/alerts/:id/resolve` | Resolver una alerta |
-
-### Purchase Orders (RF-04, RF-05)
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/purchase-orders` | Crear orden de compra |
-| GET | `/purchase-orders` | Listar órdenes (con filtros) |
-| GET | `/purchase-orders/:id` | Obtener orden por ID |
-| PATCH | `/purchase-orders/:id/approve` | Aprobar orden (PENDING → APPROVED) |
-| PATCH | `/purchase-orders/:id/reject` | Rechazar orden (PENDING → REJECTED) |
-| PATCH | `/purchase-orders/:id/receive` | Recibir orden (APPROVED → RECEIVED) |
-
-## Licencia
-
-Privado - MercadoExpress
+Ver `prisma/schema.prisma` para detalle completo de campos y relaciones.
