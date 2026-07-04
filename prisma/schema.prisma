@@ -1,8 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model Product {
+  id                 String              @id @default(uuid())
+  name               String
+  sku                String              @unique @map("sku")
+  category           String              @map("category")
+  price              Decimal             @db.Decimal(10, 2)
+  currentStock       Int                 @default(0) @map("current_stock")
+  minimumStock       Int                 @map("minimum_stock")
+  supplier           String              @map("supplier")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  alerts             Alert[]
+  inventoryMovements InventoryMovement[]
+  purchaseOrders     PurchaseOrder[]
+
+  @@index([category])
+  @@index([supplier])
+  @@index([currentStock])
+  @@map("products")
+}
+
+model InventoryMovement {
+  id        String                @id @default(uuid())
+  productId String                @map("product_id")
+  type      InventoryMovementType
+  quantity  Int
+  reason    String
+  createdAt DateTime              @default(now()) @map("created_at")
+  product   Product               @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@map("inventory_movements")
+}
+
+model Alert {
+  id         String      @id @default(uuid())
+  productId  String      @map("product_id")
+  type       AlertType
+  status     AlertStatus
+  resolvedAt DateTime?   @map("resolved_at")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  product    Product     @relation(fields: [productId], references: [id])
+
+  @@index([status])
+  @@index([productId])
+  @@map("alerts")
+}
+
+model PurchaseOrder {
+  id              String              @id @default(uuid())
+  productId       String              @map("product_id")
+  supplier        String
+  quantity        Int
+  status          PurchaseOrderStatus
+  rejectionReason String?             @map("rejection_reason")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+  approvedAt      DateTime?           @map("approved_at")
+  receivedAt      DateTime?           @map("received_at")
+  product         Product             @relation(fields: [productId], references: [id])
+
+  @@index([status])
+  @@index([productId])
+  @@map("purchase_orders")
+}
+
+enum InventoryMovementType {
+  ENTRY
+  EXIT
+}
+
+enum AlertType {
+  LOW_STOCK
+}
+
+enum AlertStatus {
+  ACTIVE
+  RESOLVED
+}
+
+enum PurchaseOrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RECEIVED
 }

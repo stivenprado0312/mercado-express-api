@@ -193,12 +193,69 @@ npm run prisma:generate
 # Crear migración
 npm run prisma:migrate
 
+# Poblar base de datos con seed
+npm run seed
+
 # Abrir Prisma Studio
 npm run prisma:studio
 
 # Resetear base de datos
 npx prisma migrate reset
 ```
+
+## Modelo de Datos
+
+El dominio de inventario está modelado con 4 entidades principales:
+
+### Product
+Producto del inventario con stock controlable.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | UUID | Identificador único |
+| `name` | String | Nombre del producto |
+| `sku` | String | Código único (alfanumérico 6-20 chars) |
+| `category` | String | Categoría (Bebidas, Lácteos, Snacks, Limpieza, etc.) |
+| `price` | Decimal | Precio unitario |
+| `currentStock` | Int | Stock actual (inicia en 0) |
+| `minimumStock` | Int | Umbral mínimo para alertas |
+| `supplier` | String | Nombre del proveedor |
+
+### InventoryMovement
+Historial de movimientos de inventario (inmutable).
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | UUID | Identificador único |
+| `productId` | UUID | Producto relacionado |
+| `type` | Enum | ENTRY (entrada) o EXIT (salida) |
+| `quantity` | Int | Cantidad movimentada |
+| `reason` | String | Motivo del movimiento |
+
+### Alert
+Alerta de stock bajo generada automáticamente.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | UUID | Identificador único |
+| `productId` | UUID | Producto relacionado |
+| `type` | Enum | LOW_STOCK |
+| `status` | Enum | ACTIVE o RESOLVED |
+| `resolvedAt` | DateTime | Fecha de resolución (nullable) |
+
+### PurchaseOrder
+Orden de compra a proveedor con snapshot del proveedor.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | UUID | Identificador único |
+| `productId` | UUID | Producto relacionado |
+| `supplier` | String | Snapshot del proveedor al momento de crear |
+| `quantity` | Int | Cantidad ordenada |
+| `status` | Enum | PENDING, APPROVED, REJECTED, RECEIVED |
+| `rejectionReason` | String | Motivo de rechazo (nullable) |
+| `approvedAt` | DateTime | Fecha de aprobación (nullable) |
+| `receivedAt` | DateTime | Fecha de recepción (nullable) |
 
 ## Scripts
 
@@ -214,6 +271,8 @@ npx prisma migrate reset
 | `npm run test:coverage` | Generar reporte de cobertura |
 | `npm run prisma:generate` | Generar cliente Prisma |
 | `npm run prisma:migrate` | Crear/aplicar migraciones |
+| `npm run prisma:seed` | Poblar base de datos con seed |
+| `npm run seed` | Ejecutar seed con tsx |
 | `npm run prisma:studio` | Abrir GUI de Prisma |
 
 ## Swagger
