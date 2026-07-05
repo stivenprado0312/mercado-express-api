@@ -2,6 +2,12 @@
 
 API REST para gestión de inventario de MercadoExpress.
 
+## Live Demo
+
+🔗 **Producción:** https://mercado-express-api.onrender.com
+
+📚 **Swagger Docs:** https://mercado-express-api.onrender.com/docs
+
 ## Descripción
 
 Sistema de gestión de inventario para cadena de tiendas minoristas. Controla stock de productos, genera alertas automáticas cuando el stock baja del umbral mínimo, y gestiona órdenes de compra a proveedores.
@@ -158,7 +164,7 @@ npm run test:coverage       # Con cobertura
 | Integración | 29 |
 | **Total** | **56** |
 
-Documentación API interactiva: `http://localhost:3000/docs`
+Documentación API interactiva: `https://mercado-express-api.onrender.com/docs`
 
 ## Commits
 
