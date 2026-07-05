@@ -1,55 +1,53 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodError } from 'zod';
 import { productsService } from './products.service';
 import {
   createProductSchema,
-  getProductByIdSchema,
-  listProductsQuerySchema
+  getProductByIdSchema
 } from './products.schemas';
 import { successResponse, createdResponse } from '../../shared/responses';
+import { validateBody, validateParams } from '../../shared/middlewares/validate-request.middleware';
 
 export class ProductsController {
-  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
+  list = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const query = listProductsQuerySchema.parse(req.query);
-      const products = await productsService.list(query);
+      if (Object.keys(req.query).length > 0) {
+        res.status(400).json({
+          success: false,
+          message: 'GET /products no soporta filtros. Usar GET /inventory para filtrar por categoría, proveedor, stock o estado de alerta.',
+          data: null
+        });
+        return;
+      }
+      const products = await productsService.list();
       successResponse(res, 'Productos encontrados', products);
     } catch (error) {
-      if (error instanceof ZodError) {
-        next(error);
-        return;
-      }
       next(error);
     }
-  }
+  };
 
-  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { id } = getProductByIdSchema.parse(req.params);
-      const product = await productsService.getById(id);
-      successResponse(res, 'Producto encontrado', product);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  getById = [
+    validateParams(getProductByIdSchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const product = await productsService.getById(req.params.id as string);
+        successResponse(res, 'Producto encontrado', product);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 
-  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const data = createProductSchema.parse(req.body);
-      const product = await productsService.create(data);
-      createdResponse(res, 'Producto creado exitosamente', product);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  create = [
+    validateBody(createProductSchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const product = await productsService.create(req.body);
+        createdResponse(res, 'Producto creado exitosamente', product);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 }
 
 export const productsController = new ProductsController();

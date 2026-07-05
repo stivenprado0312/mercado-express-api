@@ -25,7 +25,7 @@ const router = Router();
  *       200:
  *         description: Órdenes encontradas
  */
-router.get('/', purchaseOrdersController.list.bind(purchaseOrdersController));
+router.get('/', purchaseOrdersController.list);
 
 /**
  * @swagger
@@ -46,7 +46,7 @@ router.get('/', purchaseOrdersController.list.bind(purchaseOrdersController));
  *       404:
  *         description: Orden no encontrada
  */
-router.get('/:id', purchaseOrdersController.getById.bind(purchaseOrdersController));
+router.get('/:id', purchaseOrdersController.getById);
 
 /**
  * @swagger
@@ -81,7 +81,7 @@ router.get('/:id', purchaseOrdersController.getById.bind(purchaseOrdersControlle
  *       422:
  *         description: Cantidad menor al mínimo (2x minimumStock)
  */
-router.post('/', purchaseOrdersController.create.bind(purchaseOrdersController));
+router.post('/', purchaseOrdersController.create);
 
 /**
  * @swagger
@@ -105,7 +105,7 @@ router.post('/', purchaseOrdersController.create.bind(purchaseOrdersController))
  *       422:
  *         description: Solo se pueden aprobar órdenes PENDING
  */
-router.patch('/:id/approve', purchaseOrdersController.approve.bind(purchaseOrdersController));
+router.patch('/:id/approve', purchaseOrdersController.approve);
 
 /**
  * @swagger
@@ -145,7 +145,7 @@ router.patch('/:id/approve', purchaseOrdersController.approve.bind(purchaseOrder
  *       422:
  *         description: Solo se pueden rechazar órdenes PENDING
  */
-router.patch('/:id/reject', purchaseOrdersController.reject.bind(purchaseOrdersController));
+router.patch('/:id/reject', purchaseOrdersController.reject);
 
 /**
  * @swagger
@@ -169,6 +169,6 @@ router.patch('/:id/reject', purchaseOrdersController.reject.bind(purchaseOrdersC
  *       422:
  *         description: Solo se pueden recibir órdenes APPROVED
  */
-router.patch('/:id/receive', purchaseOrdersController.receive.bind(purchaseOrdersController));
+router.patch('/:id/receive', purchaseOrdersController.receive);
 
 export default router;

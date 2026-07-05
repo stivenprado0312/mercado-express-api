@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodError } from 'zod';
 import { purchaseOrdersService } from './purchase-orders.service';
 import {
   createPurchaseOrderSchema,
@@ -8,91 +7,81 @@ import {
   listPurchaseOrdersQuerySchema
 } from './purchase-orders.schemas';
 import { successResponse } from '../../shared/responses';
+import { validateBody, validateQuery, validateParams } from '../../shared/middlewares/validate-request.middleware';
 
 export class PurchaseOrdersController {
-  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const query = listPurchaseOrdersQuerySchema.parse(req.query);
-      const orders = await purchaseOrdersService.list(query);
-      successResponse(res, 'Órdenes de compra encontradas', orders);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  list = [
+    validateQuery(listPurchaseOrdersQuerySchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const orders = await purchaseOrdersService.list(req.query as any);
+        successResponse(res, 'Órdenes de compra encontradas', orders);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 
-  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { id } = getPurchaseOrderByIdSchema.parse(req.params);
-      const order = await purchaseOrdersService.getById(id);
-      successResponse(res, 'Orden de compra encontrada', order);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  getById = [
+    validateParams(getPurchaseOrderByIdSchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const order = await purchaseOrdersService.getById(req.params.id as string);
+        successResponse(res, 'Orden de compra encontrada', order);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 
-  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const data = createPurchaseOrderSchema.parse(req.body);
-      const order = await purchaseOrdersService.create(data);
-      successResponse(res, 'Orden de compra creada exitosamente', order, 201);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  create = [
+    validateBody(createPurchaseOrderSchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const order = await purchaseOrdersService.create(req.body);
+        successResponse(res, 'Orden de compra creada exitosamente', order, 201);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 
-  async approve(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { id } = getPurchaseOrderByIdSchema.parse(req.params);
-      const order = await purchaseOrdersService.approve(id);
-      successResponse(res, 'Orden de compra aprobada', order);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  approve = [
+    validateParams(getPurchaseOrderByIdSchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const order = await purchaseOrdersService.approve(req.params.id as string);
+        successResponse(res, 'Orden de compra aprobada', order);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 
-  async reject(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { id, rejectionReason } = rejectPurchaseOrderSchema.parse(req.body);
-      const order = await purchaseOrdersService.reject(id, rejectionReason);
-      successResponse(res, 'Orden de compra rechazada', order);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  reject = [
+    validateBody(rejectPurchaseOrderSchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const { rejectionReason } = req.body;
+        const order = await purchaseOrdersService.reject(req.params.id as string, rejectionReason);
+        successResponse(res, 'Orden de compra rechazada', order);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 
-  async receive(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { id } = getPurchaseOrderByIdSchema.parse(req.params);
-      const order = await purchaseOrdersService.receive(id);
-      successResponse(res, 'Orden de compra recibida', order);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  receive = [
+    validateParams(getPurchaseOrderByIdSchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const order = await purchaseOrdersService.receive(req.params.id as string);
+        successResponse(res, 'Orden de compra recibida', order);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 }
 
 export const purchaseOrdersController = new PurchaseOrdersController();

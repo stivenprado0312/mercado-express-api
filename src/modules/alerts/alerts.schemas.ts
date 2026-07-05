@@ -1,11 +1,11 @@
 import { z } from 'zod';
+import { uuidSchema } from '../../shared/constants/domain.constants';
+import { alertStatusFilterSchema } from '../../shared/schemas/common.schemas';
 
-export const listAlertsQuerySchema = z.object({
-  status: z.enum(['ACTIVE', 'RESOLVED']).optional()
-});
+export const listAlertsQuerySchema = alertStatusFilterSchema;
 
 export const getAlertByIdSchema = z.object({
-  id: z.string().uuid('ID debe ser un UUID válido')
+  id: uuidSchema
 });
 
 export type ListAlertsQuery = z.infer<typeof listAlertsQuerySchema>;

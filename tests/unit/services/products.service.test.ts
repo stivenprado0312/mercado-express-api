@@ -95,7 +95,7 @@ describe('ProductsService', () => {
 
       jest.spyOn(productsRepository, 'findAll').mockResolvedValue(mockProducts as any);
 
-      const result = await service.list({});
+      const result = await service.list();
 
       expect(result).toEqual(mockProducts);
     });

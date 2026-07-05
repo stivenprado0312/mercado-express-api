@@ -1,5 +1,6 @@
 import prisma from '../../database/index';
 import type { CreatePurchaseOrderDto, ListPurchaseOrdersQuery } from './purchase-orders.schemas';
+import { OrderStatus } from '../../shared/constants/domain.constants';
 
 export class PurchaseOrdersRepository {
   async findById(id: string) {
@@ -27,11 +28,15 @@ export class PurchaseOrdersRepository {
     });
   }
 
-  async create(data: CreatePurchaseOrderDto & { supplier: string; status: 'PENDING' }) {
+  async create(data: CreatePurchaseOrderDto & { supplier: string; status: typeof OrderStatus[keyof typeof OrderStatus] }) {
     return prisma.purchaseOrder.create({ data });
   }
 
-  async updateStatus(id: string, status: 'APPROVED' | 'REJECTED' | 'RECEIVED', extraData?: Record<string, unknown>) {
+  async updateStatus(
+    id: string,
+    status: typeof OrderStatus[keyof typeof OrderStatus],
+    extraData?: Record<string, unknown>
+  ) {
     return prisma.purchaseOrder.update({
       where: { id },
       data: {

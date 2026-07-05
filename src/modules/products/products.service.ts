@@ -1,6 +1,6 @@
 import { ConflictError, NotFoundError } from '../../shared/errors';
 import { productsRepository } from './products.repository';
-import type { CreateProductDto, ListProductsQuery } from './products.schemas';
+import type { CreateProductDto } from './products.schemas';
 
 export class ProductsService {
   async getById(id: string) {
@@ -19,8 +19,8 @@ export class ProductsService {
     return product;
   }
 
-  async list(query: ListProductsQuery) {
-    return productsRepository.findAll(query);
+  async list() {
+    return productsRepository.findAll();
   }
 
   async create(data: CreateProductDto) {

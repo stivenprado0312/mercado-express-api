@@ -1,23 +1,24 @@
 import { z } from 'zod';
+import { BUSINESS_RULES, uuidSchema } from '../../shared/constants/domain.constants';
+import { orderStatusFilterSchema } from '../../shared/schemas/common.schemas';
 
 export const createPurchaseOrderSchema = z.object({
-  productId: z.string().uuid('ID debe ser un UUID válido'),
+  productId: uuidSchema,
   quantity: z.number().int().positive('Cantidad debe ser mayor a 0')
 });
 
 export const getPurchaseOrderByIdSchema = z.object({
-  id: z.string().uuid('ID debe ser un UUID válido')
+  id: uuidSchema
 });
 
 export const rejectPurchaseOrderSchema = z.object({
-  id: z.string().uuid('ID debe ser un UUID válido'),
-  rejectionReason: z.string().min(10, 'Motivo de rechazo debe tener al menos 10 caracteres')
+  rejectionReason: z.string().min(
+    BUSINESS_RULES.MINIMUM_REJECTION_LENGTH,
+    `Motivo de rechazo debe tener al menos ${BUSINESS_RULES.MINIMUM_REJECTION_LENGTH} caracteres`
+  )
 });
 
-export const listPurchaseOrdersQuerySchema = z.object({
-  status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'RECEIVED']).optional(),
-  productId: z.string().uuid().optional()
-});
+export const listPurchaseOrdersQuerySchema = orderStatusFilterSchema;
 
 export type CreatePurchaseOrderDto = z.infer<typeof createPurchaseOrderSchema>;
 export type GetPurchaseOrderByIdDto = z.infer<typeof getPurchaseOrderByIdSchema>;

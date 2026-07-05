@@ -41,7 +41,7 @@ const router = Router();
  *       200:
  *         description: Inventario consultado exitosamente
  */
-router.get('/', inventoryController.list.bind(inventoryController));
+router.get('/', inventoryController.list);
 
 /**
  * @swagger
@@ -83,7 +83,7 @@ router.get('/', inventoryController.list.bind(inventoryController));
  *       422:
  *         description: Stock insuficiente (regla de negocio)
  */
-router.post('/adjust', inventoryController.adjust.bind(inventoryController));
+router.post('/adjust', inventoryController.adjust);
 
 /**
  * @swagger
@@ -107,7 +107,7 @@ router.post('/adjust', inventoryController.adjust.bind(inventoryController));
  */
 router.get(
   '/movements/:productId',
-  inventoryController.getMovements.bind(inventoryController)
+  inventoryController.getMovements
 );
 
 export default router;

@@ -1,5 +1,7 @@
 import prisma from '../../database/index';
-import type { AdjustInventoryDto } from './inventory.schemas';
+import type { AdjustInventoryDto, ListInventoryQuery } from './inventory.schemas';
+import { buildProductFilters } from '../../shared/utils';
+import { AlertStatus } from '../../shared/constants/domain.constants';
 
 export class InventoryRepository {
   async findProductById(id: string) {
@@ -28,7 +30,7 @@ export class InventoryRepository {
     return prisma.alert.findFirst({
       where: {
         productId,
-        status: 'ACTIVE'
+        status: AlertStatus.ACTIVE
       }
     });
   }
@@ -37,7 +39,7 @@ export class InventoryRepository {
     return prisma.alert.update({
       where: { id: alertId },
       data: {
-        status: 'RESOLVED',
+        status: AlertStatus.RESOLVED,
         resolvedAt: new Date()
       }
     });
@@ -48,37 +50,13 @@ export class InventoryRepository {
       data: {
         productId,
         type: 'LOW_STOCK',
-        status: 'ACTIVE'
+        status: AlertStatus.ACTIVE
       }
     });
   }
 
-  async findProductsWithFilters(query: {
-    category?: string;
-    supplier?: string;
-    minStock?: number;
-    maxStock?: number;
-    alertStatus?: 'ACTIVE' | 'RESOLVED';
-  }) {
-    const where: Record<string, unknown> = {};
-
-    if (query.category) {
-      where.category = query.category;
-    }
-
-    if (query.supplier) {
-      where.supplier = query.supplier;
-    }
-
-    if (query.minStock !== undefined || query.maxStock !== undefined) {
-      where.currentStock = {};
-      if (query.minStock !== undefined) {
-        (where.currentStock as Record<string, number>).gte = query.minStock;
-      }
-      if (query.maxStock !== undefined) {
-        (where.currentStock as Record<string, number>).lte = query.maxStock;
-      }
-    }
+  async findProductsWithFilters(query: ListInventoryQuery) {
+    const where = buildProductFilters(query);
 
     if (query.alertStatus) {
       where.alerts = {
@@ -92,7 +70,7 @@ export class InventoryRepository {
       where,
       include: {
         alerts: {
-          where: { status: 'ACTIVE' }
+          where: { status: AlertStatus.ACTIVE }
         }
       },
       orderBy: { createdAt: 'desc' }

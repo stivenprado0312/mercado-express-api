@@ -1,5 +1,6 @@
 import prisma from '../../database/index';
 import type { ListAlertsQuery } from './alerts.schemas';
+import { AlertStatus } from '../../shared/constants/domain.constants';
 
 export class AlertsRepository {
   async findById(id: string) {
@@ -27,7 +28,7 @@ export class AlertsRepository {
     return prisma.alert.update({
       where: { id },
       data: {
-        status: 'RESOLVED',
+        status: AlertStatus.RESOLVED,
         resolvedAt: new Date()
       }
     });

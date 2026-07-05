@@ -21,7 +21,7 @@ const router = Router();
  *       200:
  *         description: Alertas encontradas
  */
-router.get('/', alertsController.list.bind(alertsController));
+router.get('/', alertsController.list);
 
 /**
  * @swagger
@@ -42,7 +42,7 @@ router.get('/', alertsController.list.bind(alertsController));
  *       404:
  *         description: Alerta no encontrada
  */
-router.get('/:id', alertsController.getById.bind(alertsController));
+router.get('/:id', alertsController.getById);
 
 /**
  * @swagger
@@ -64,6 +64,6 @@ router.get('/:id', alertsController.getById.bind(alertsController));
  *       404:
  *         description: Alerta no encontrada
  */
-router.post('/:id/resolve', alertsController.resolve.bind(alertsController));
+router.post('/:id/resolve', alertsController.resolve);
 
 export default router;

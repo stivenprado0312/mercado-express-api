@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodError } from 'zod';
 import { inventoryService } from './inventory.service';
 import {
   adjustInventorySchema,
@@ -7,49 +6,44 @@ import {
   listInventoryQuerySchema
 } from './inventory.schemas';
 import { successResponse } from '../../shared/responses';
+import { validateBody, validateQuery, validateParams } from '../../shared/middlewares/validate-request.middleware';
 
 export class InventoryController {
-  async adjust(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const data = adjustInventorySchema.parse(req.body);
-      const product = await inventoryService.adjustStock(data);
-      successResponse(res, 'Stock ajustado exitosamente', product);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  adjust = [
+    validateBody(adjustInventorySchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const product = await inventoryService.adjustStock(req.body);
+        successResponse(res, 'Stock ajustado exitosamente', product);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 
-  async getMovements(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { productId } = getMovementsByProductSchema.parse(req.params);
-      const movements = await inventoryService.getMovementsByProductId(productId);
-      successResponse(res, 'Movimientos encontrados', movements);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  getMovements = [
+    validateParams(getMovementsByProductSchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const movements = await inventoryService.getMovementsByProductId(req.params.productId as string);
+        successResponse(res, 'Movimientos encontrados', movements);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 
-  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const query = listInventoryQuerySchema.parse(req.query);
-      const inventory = await inventoryService.listInventory(query);
-      successResponse(res, 'Inventario consultado', inventory);
-    } catch (error) {
-      if (error instanceof ZodError) {
+  list = [
+    validateQuery(listInventoryQuerySchema),
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const inventory = await inventoryService.listInventory(req.query as any);
+        successResponse(res, 'Inventario consultado', inventory);
+      } catch (error) {
         next(error);
-        return;
       }
-      next(error);
     }
-  }
+  ];
 }
 
 export const inventoryController = new InventoryController();

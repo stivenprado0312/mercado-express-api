@@ -1,13 +1,7 @@
 import { z } from 'zod';
+import { CATEGORIES, uuidSchema } from '../../shared/constants/domain.constants';
 
-export const CATEGORIES = [
-  'Bebidas',
-  'Lácteos',
-  'Snacks',
-  'Limpieza',
-  'Frutas',
-  'Granos'
-] as const;
+export { CATEGORIES };
 
 export const createProductSchema = z.object({
   name: z.string().min(3).max(100),
@@ -24,15 +18,10 @@ export const createProductSchema = z.object({
 });
 
 export const getProductByIdSchema = z.object({
-  id: z.string().uuid('ID debe ser un UUID válido')
+  id: uuidSchema
 });
 
-export const listProductsQuerySchema = z.object({
-  category: z.enum(CATEGORIES).optional(),
-  supplier: z.string().optional(),
-  minStock: z.coerce.number().int().optional(),
-  maxStock: z.coerce.number().int().optional()
-});
+export const listProductsQuerySchema = z.object({});
 
 export type CreateProductDto = z.infer<typeof createProductSchema>;
 export type ListProductsQuery = z.infer<typeof listProductsQuerySchema>;
